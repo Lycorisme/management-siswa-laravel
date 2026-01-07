@@ -34,7 +34,10 @@ class DatabaseSeeder extends Seeder
             // 6. Kategori Poin
             PoinKategoriSeeder::class,
             
-            // 7. Settings
+            // 7. Data Siswa (references kelas)
+            SiswaSeeder::class,
+            
+            // 8. Settings
             SettingsSeeder::class,
         ]);
 
