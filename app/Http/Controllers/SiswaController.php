@@ -581,7 +581,7 @@ class SiswaController extends Controller
     private function uploadFoto($file)
     {
         $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-        $file->storeAs('public/siswa', $filename);
+        $file->storeAs('siswa', $filename, 'public');
         return $filename;
     }
 
@@ -590,9 +590,8 @@ class SiswaController extends Controller
      */
     private function deleteFoto($filename)
     {
-        $path = 'public/siswa/' . $filename;
-        if (Storage::exists($path)) {
-            Storage::delete($path);
+        if (Storage::disk('public')->exists('siswa/' . $filename)) {
+            Storage::disk('public')->delete('siswa/' . $filename);
         }
     }
 }

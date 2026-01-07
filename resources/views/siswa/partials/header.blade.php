@@ -3,13 +3,22 @@
     {{-- Page Title & Breadcrumb --}}
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Data Siswa</h1>
-            <nav class="flex items-center gap-2 text-sm text-gray-500 mt-1">
-                <a href="{{ route('dashboard') }}" class="hover:text-indigo-600 transition-colors">Dashboard</a>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-                <span class="text-indigo-600 font-medium">Data Siswa</span>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Data Siswa</h1>
+            <nav class="flex items-center gap-3">
+                <a href="{{ route('dashboard') }}" 
+                   class="group flex items-center justify-center w-8 h-8 bg-white/50 backdrop-blur-sm rounded-lg border border-gray-100 text-gray-500 hover:bg-white hover:text-indigo-600 hover:shadow-md transition-all duration-300"
+                   title="Dashboard">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                </a>
+                
+                <span class="text-gray-300">/</span>
+                
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg border border-indigo-100 shadow-sm">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                    <span class="text-sm font-semibold text-indigo-700">Data Siswa</span>
+                </div>
             </nav>
         </div>
         

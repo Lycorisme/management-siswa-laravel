@@ -42,23 +42,24 @@
                 </div>
             </div>
 
-            {{-- Quick Actions --}}
-            <div class="absolute bottom-4 right-8 flex items-center gap-2">
-                <button @click="showDetailModal = false; openEditModal(detailData.id)" 
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl text-sm font-medium transition-colors backdrop-blur-sm">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                    </svg>
-                    Edit
-                </button>
-            </div>
+
         </div>
 
         {{-- Modal Body (Scrollable) --}}
         <div class="flex-1 overflow-y-auto pt-20 pb-8 px-8">
             {{-- Header Info --}}
             <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-900" x-text="detailData.nama_lengkap"></h2>
+                <div class="flex items-start justify-between">
+                    <h2 class="text-2xl font-bold text-gray-900" x-text="detailData.nama_lengkap"></h2>
+                    
+                    <button @click="showDetailModal = false; openEditModal(detailData.id)" 
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl text-sm font-medium transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Edit Data
+                    </button>
+                </div>
                 <div class="flex items-center gap-3 mt-2">
                     <span class="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium"
                           :class="detailData.jenis_kelamin === 'L' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'"

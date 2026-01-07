@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Siswa extends Model
 {
@@ -111,10 +112,10 @@ class Siswa extends Model
      */
     public function getFotoUrlAttribute()
     {
-        if ($this->foto && file_exists(public_path('storage/siswa/' . $this->foto))) {
+        if ($this->foto && Storage::disk('public')->exists('siswa/' . $this->foto)) {
             return asset('storage/siswa/' . $this->foto);
         }
-        return asset('images/default-avatar.png');
+        return null;
     }
 
     /**

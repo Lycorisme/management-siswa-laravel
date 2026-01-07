@@ -1,24 +1,27 @@
 <script>
-function siswaApp() {
+function guruApp() {
     return {
         // State
         loading: false,
-        siswaList: [],
+        guruList: [],
         stats: {},
         pagination: {},
         selectedItems: [],
         selectAll: false,
+        bidangStudiList: @json($bidangStudiList ?? []),
+        currentUserId: {{ auth()->id() }},
 
         // Modal states
         showFormModal: false,
         showDetailModal: false,
         showDeleteModal: false,
+        showResetPasswordModal: false,
 
         // Form state
         isEditMode: false,
         editId: null,
         isSubmitting: false,
-        activeTab: 'pribadi',
+        activeTab: 'akun',
         formData: {},
         formErrors: {},
         fotoFile: null,
@@ -28,16 +31,23 @@ function siswaApp() {
         detailData: {},
 
         // Delete state
-        deleteType: 'single', // 'single' or 'bulk'
+        deleteType: 'single',
         deleteTarget: null,
         isDeleting: false,
+
+        // Reset password state
+        resetPasswordTarget: null,
+        resetPasswordData: {},
+        resetPasswordErrors: {},
+        isResettingPassword: false,
+        showPassword: false,
 
         // Filters
         filters: {
             search: '',
-            kelas_id: '',
+            role: '',
+            bidang_studi: '',
             status: '',
-            jenis_kelamin: '',
             per_page: 10,
             page: 1,
             sort_by: 'nama_lengkap',
@@ -57,19 +67,20 @@ function siswaApp() {
                     page: this.filters.page,
                     per_page: this.filters.per_page,
                     search: this.filters.search,
-                    kelas_id: this.filters.kelas_id,
+                    role: this.filters.role,
+                    bidang_studi: this.filters.bidang_studi,
                     status: this.filters.status,
-                    jenis_kelamin: this.filters.jenis_kelamin,
                     sort_by: this.filters.sort_by,
                     sort_order: this.filters.sort_order
                 });
 
-                const response = await fetch(`/api/siswa?${params}`);
+                const response = await fetch(`/api/guru?${params}`);
                 const result = await response.json();
 
                 if (result.success) {
-                    this.siswaList = result.data.data;
+                    this.guruList = result.data.data;
                     this.stats = result.stats;
+                    this.bidangStudiList = result.bidang_studi_list || this.bidangStudiList;
                     this.pagination = {
                         current_page: result.data.current_page,
                         last_page: result.data.last_page,
@@ -80,7 +91,7 @@ function siswaApp() {
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
-                this.showToast('error', 'Gagal memuat data siswa');
+                this.showToast('error', 'Gagal memuat data guru/staff');
             } finally {
                 this.loading = false;
             }
@@ -100,7 +111,7 @@ function siswaApp() {
         // Toggle select all
         toggleSelectAll() {
             if (this.selectAll) {
-                this.selectedItems = this.siswaList.map(s => s.id);
+                this.selectedItems = this.guruList.map(g => g.id);
             } else {
                 this.selectedItems = [];
             }
@@ -145,7 +156,7 @@ function siswaApp() {
             this.resetForm();
             this.isEditMode = false;
             this.editId = null;
-            this.activeTab = 'pribadi';
+            this.activeTab = 'akun';
             this.showFormModal = true;
             document.body.style.overflow = 'hidden';
         },
@@ -155,10 +166,10 @@ function siswaApp() {
             this.resetForm();
             this.isEditMode = true;
             this.editId = id;
-            this.activeTab = 'pribadi';
+            this.activeTab = 'akun';
 
             try {
-                const response = await fetch(`/api/siswa/${id}`);
+                const response = await fetch(`/api/guru/${id}`);
                 const result = await response.json();
 
                 if (result.success) {
@@ -169,11 +180,11 @@ function siswaApp() {
                     this.showFormModal = true;
                     document.body.style.overflow = 'hidden';
                 } else {
-                    this.showToast('error', result.message || 'Gagal memuat data siswa');
+                    this.showToast('error', result.message || 'Gagal memuat data guru/staff');
                 }
             } catch (error) {
-                console.error('Error fetching siswa:', error);
-                this.showToast('error', 'Gagal memuat data siswa');
+                console.error('Error fetching guru:', error);
+                this.showToast('error', 'Gagal memuat data guru/staff');
             }
         },
 
@@ -187,33 +198,20 @@ function siswaApp() {
         // Reset form
         resetForm() {
             this.formData = {
-                nis: '',
-                nisn: '',
+                username: '',
+                email: '',
+                password: '',
                 nama_lengkap: '',
                 jenis_kelamin: 'L',
+                nip: '',
                 tempat_lahir: '',
                 tanggal_lahir: '',
-                agama: '',
-                alamat: '',
-                rt_rw: '',
-                kelurahan: '',
-                kecamatan: '',
-                kota: '',
-                provinsi: '',
-                kode_pos: '',
                 no_telepon: '',
-                email: '',
-                nama_ayah: '',
-                nama_ibu: '',
-                pekerjaan_ayah: '',
-                pekerjaan_ibu: '',
-                no_telepon_ortu: '',
-                kelas_id: '',
-                status: 'aktif',
-                tahun_masuk: new Date().getFullYear(),
-                tahun_keluar: '',
-                total_poin_prestasi: 0,
-                total_poin_pelanggaran: 0
+                alamat: '',
+                role: 'guru',
+                jabatan: '',
+                bidang_studi: '',
+                status: 'aktif'
             };
             this.formErrors = {};
             this.fotoFile = null;
@@ -225,13 +223,11 @@ function siswaApp() {
             const file = event.target.files[0];
             if (!file) return;
 
-            // Validate file type
             if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
                 this.formErrors.foto = 'Format file harus JPG atau PNG';
                 return;
             }
 
-            // Validate file size (max 2MB)
             if (file.size > 2 * 1024 * 1024) {
                 this.formErrors.foto = 'Ukuran file maksimal 2MB';
                 return;
@@ -240,7 +236,6 @@ function siswaApp() {
             this.fotoFile = file;
             this.formErrors.foto = '';
 
-            // Create preview
             const reader = new FileReader();
             reader.onload = (e) => {
                 this.fotoPreview = e.target.result;
@@ -265,25 +260,22 @@ function siswaApp() {
             try {
                 const formData = new FormData();
 
-                // Append all form fields
-                const excludedFields = ['foto', 'foto_url', 'created_at', 'updated_at', 'deleted_at', 'kelas'];
-                
+                const excludedFields = ['foto', 'foto_url', 'created_at', 'updated_at', 'email_verified_at', 'remember_token'];
+
                 for (const [key, value] of Object.entries(this.formData)) {
                     if (excludedFields.includes(key)) continue;
-                    
+
                     if (value !== null && value !== undefined && value !== '') {
                         formData.append(key, value);
                     }
                 }
 
-                // Append foto file if exists
                 if (this.fotoFile) {
                     formData.append('foto', this.fotoFile);
                 }
 
-                const url = this.isEditMode ? `/api/siswa/${this.editId}` : '/api/siswa';
+                const url = this.isEditMode ? `/api/guru/${this.editId}` : '/api/guru';
                 
-                // For PUT requests with files, use POST with _method
                 if (this.isEditMode) {
                     formData.append('_method', 'PUT');
                 }
@@ -323,7 +315,7 @@ function siswaApp() {
         // View detail
         async viewDetail(id) {
             try {
-                const response = await fetch(`/api/siswa/${id}`);
+                const response = await fetch(`/api/guru/${id}`);
                 const result = await response.json();
 
                 if (result.success) {
@@ -331,18 +323,18 @@ function siswaApp() {
                     this.showDetailModal = true;
                     document.body.style.overflow = 'hidden';
                 } else {
-                    this.showToast('error', result.message || 'Gagal memuat detail siswa');
+                    this.showToast('error', result.message || 'Gagal memuat detail guru/staff');
                 }
             } catch (error) {
                 console.error('Error fetching detail:', error);
-                this.showToast('error', 'Gagal memuat detail siswa');
+                this.showToast('error', 'Gagal memuat detail guru/staff');
             }
         },
 
         // Confirm delete single
-        confirmDelete(siswa) {
+        confirmDelete(guru) {
             this.deleteType = 'single';
-            this.deleteTarget = siswa;
+            this.deleteTarget = guru;
             this.showDeleteModal = true;
         },
 
@@ -356,13 +348,19 @@ function siswaApp() {
 
         // Execute delete
         async executeDelete() {
+            // Prevent self-deletion
+            if (this.deleteType === 'single' && this.deleteTarget?.id === this.currentUserId) {
+                this.showToast('error', 'Anda tidak dapat menghapus akun Anda sendiri');
+                return;
+            }
+
             this.isDeleting = true;
 
             try {
                 let response;
 
                 if (this.deleteType === 'single') {
-                    response = await fetch(`/api/siswa/${this.deleteTarget.id}`, {
+                    response = await fetch(`/api/guru/${this.deleteTarget.id}`, {
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
@@ -370,7 +368,7 @@ function siswaApp() {
                         }
                     });
                 } else {
-                    response = await fetch('/api/siswa/bulk-delete', {
+                    response = await fetch('/api/guru/bulk-delete', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
@@ -396,6 +394,66 @@ function siswaApp() {
                 this.showToast('error', 'Gagal menghapus data');
             } finally {
                 this.isDeleting = false;
+            }
+        },
+
+        // Open reset password modal
+        openResetPasswordModal(guru) {
+            this.resetPasswordTarget = guru;
+            this.resetPasswordData = {
+                new_password: '',
+                new_password_confirmation: ''
+            };
+            this.resetPasswordErrors = {};
+            this.showPassword = false;
+            this.showResetPasswordModal = true;
+            document.body.style.overflow = 'hidden';
+        },
+
+        // Close reset password modal
+        closeResetPasswordModal() {
+            this.showResetPasswordModal = false;
+            document.body.style.overflow = '';
+            this.resetPasswordTarget = null;
+            this.resetPasswordData = {};
+            this.resetPasswordErrors = {};
+        },
+
+        // Execute reset password
+        async executeResetPassword() {
+            this.isResettingPassword = true;
+            this.resetPasswordErrors = {};
+
+            try {
+                const response = await fetch(`/api/guru/${this.resetPasswordTarget.id}/reset-password`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.resetPasswordData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.showToast('success', result.message);
+                    this.closeResetPasswordModal();
+                } else {
+                    if (result.errors) {
+                        this.resetPasswordErrors = {};
+                        for (const [key, messages] of Object.entries(result.errors)) {
+                            this.resetPasswordErrors[key] = messages[0];
+                        }
+                    } else {
+                        this.showToast('error', result.message || 'Gagal mereset password');
+                    }
+                }
+            } catch (error) {
+                console.error('Error resetting password:', error);
+                this.showToast('error', 'Gagal mereset password');
+            } finally {
+                this.isResettingPassword = false;
             }
         },
 

@@ -108,9 +108,9 @@
         </a>
 
         <!-- Data Guru/Staff -->
-        <a href="{{ Route::has('teachers.index') ? route('teachers.index') : '#' }}" 
+        <a href="{{ Route::has('guru.index') ? route('guru.index') : '#' }}" 
            class="flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group/item
-                  {{ request()->routeIs('teachers.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 hover:scale-[1.02]' : 'text-gray-600 hover:bg-white/50 hover:text-indigo-700' }}">
+                  {{ request()->routeIs('guru.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 hover:scale-[1.02]' : 'text-gray-600 hover:bg-white/50 hover:text-indigo-700' }}">
             <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
             </svg>
@@ -118,16 +118,12 @@
                   :class="sidebarOpen ? 'w-auto opacity-100' : 'w-0 opacity-0 lg:group-hover:w-auto lg:group-hover:opacity-100'">
                 Data Guru/Staff
             </span>
-            @unless(Route::has('teachers.index'))
-            <span class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-600 rounded-full"
-                  :class="sidebarOpen ? 'block' : 'hidden lg:group-hover:block'">Soon</span>
-            @endunless
         </a>
 
         <!-- Manajemen Kelas -->
-        <a href="{{ Route::has('classes.index') ? route('classes.index') : '#' }}" 
+        <a href="{{ Route::has('kelas.index') ? route('kelas.index') : '#' }}" 
            class="flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group/item
-                  {{ request()->routeIs('classes.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 hover:scale-[1.02]' : 'text-gray-600 hover:bg-white/50 hover:text-indigo-700' }}">
+                  {{ request()->routeIs('kelas.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 hover:scale-[1.02]' : 'text-gray-600 hover:bg-white/50 hover:text-indigo-700' }}">
             <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
             </svg>
@@ -135,10 +131,6 @@
                   :class="sidebarOpen ? 'w-auto opacity-100' : 'w-0 opacity-0 lg:group-hover:w-auto lg:group-hover:opacity-100'">
                 Manajemen Kelas
             </span>
-            @unless(Route::has('classes.index'))
-            <span class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-600 rounded-full"
-                  :class="sidebarOpen ? 'block' : 'hidden lg:group-hover:block'">Soon</span>
-            @endunless
         </a>
 
         <!-- Mata Pelajaran -->
